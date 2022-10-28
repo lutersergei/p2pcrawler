@@ -23,8 +23,9 @@ func (a *AlertRepo) Match(history *price.PriceHistory) []*alert.AlertDB {
 }
 
 func (a *AlertRepo) Insert(model *alert.AlertDB) error {
-	//TODO implement me
-	panic("implement me")
+	result := a.db.Omit("CreatedAt").Create(model)
+
+	return result.Error
 }
 
 func (a *AlertRepo) Deactivate(model *alert.AlertDB) {

@@ -7,7 +7,6 @@ import (
 	"p2p_crawler/pkg/alert"
 	"p2p_crawler/pkg/config"
 	"p2p_crawler/pkg/price"
-	"time"
 )
 
 type TelegramHandler struct {
@@ -16,17 +15,8 @@ type TelegramHandler struct {
 	logger *zap.SugaredLogger
 }
 
-func NewTelegramHandler(cfg *config.Config, logger *zap.SugaredLogger) *TelegramHandler {
-	// bot settings
-	pref := tele.Settings{
-		Token:  cfg.TgBotToken,
-		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
-	}
-	bot, err := tele.NewBot(pref)
-	if err != nil {
-		logger.Fatalw("connect to bot: ", zap.Error(err))
-		return nil
-	}
+func NewTelegramHandler(cfg *config.Config, logger *zap.SugaredLogger, bot *tele.Bot) *TelegramHandler {
+
 	return &TelegramHandler{cfg: cfg, bot: bot, logger: logger}
 }
 
