@@ -19,7 +19,7 @@ func NewBinanceService(client *http.Client) *BinanceService {
 	return &BinanceService{client: client}
 }
 
-func (svc *BinanceService) DoRequest() (*price.PriceHistoryDB, error) {
+func (svc *BinanceService) DoRequest() (*price.PriceHistory, error) {
 	resp, err := svc.client.Do(makeRequest())
 	if err != nil {
 		return nil, fmt.Errorf("binance request: %w", err)
@@ -39,7 +39,7 @@ func (svc *BinanceService) DoRequest() (*price.PriceHistoryDB, error) {
 	return svc.handleResponse(data)
 }
 
-func (svc *BinanceService) handleResponse(resp *binance.Response) (*price.PriceHistoryDB, error) {
+func (svc *BinanceService) handleResponse(resp *binance.Response) (*price.PriceHistory, error) {
 	if len(resp.Data) == 0 {
 		return nil, nil
 	}
@@ -58,8 +58,8 @@ func (svc *BinanceService) handleResponse(resp *binance.Response) (*price.PriceH
 
 	rawJSON, _ := json.Marshal(bestResult)
 
-	model := &price.PriceHistoryDB{
-		MaxPrice:      priceFloat,
+	model := &price.PriceHistory{
+		BestPrice:     priceFloat,
 		Username:      bestResult.Advertiser.NickName,
 		RawJSON:       string(rawJSON),
 		SurplusAmount: surplusAmount,

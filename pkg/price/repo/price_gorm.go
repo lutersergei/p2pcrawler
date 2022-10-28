@@ -13,7 +13,7 @@ func NewPriceRepo(db *gorm.DB) *PriceRepo {
 	return &PriceRepo{db: db}
 }
 
-func (r *PriceRepo) Insert(history *price.PriceHistoryDB) error {
+func (r *PriceRepo) Insert(history *price.PriceHistory) error {
 	result := r.db.Create(history)
 
 	return result.Error

@@ -9,6 +9,9 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	goose "p2p_crawler/migration"
+	"p2p_crawler/pkg/alert/handler"
+	"p2p_crawler/pkg/alert/repository"
+	service2 "p2p_crawler/pkg/alert/service"
 	"p2p_crawler/pkg/binance/service"
 	"p2p_crawler/pkg/config"
 	"p2p_crawler/pkg/crawler"
@@ -45,12 +48,19 @@ func main() {
 
 	binanceSvc := service.NewBinanceService(httpClient)
 	priceRepo := repo.NewPriceRepo(gormDB)
+	alertRepo := repository.NewAlertRepo(gormDB)
 	priceSvc := price.NewPriceService(priceRepo, sugar)
 
-	var pb interface{}
-	crw := crawler.NewCrawler([]crawler.ExchangeInterface{binanceSvc}, priceSvc, pb, sugar, cfg)
+	tgHandler := handler.NewTelegramHandler(cfg, sugar)
+	alertSvc := service2.NewAlertService(tgHandler, alertRepo, sugar)
 
-	crw.Run()
+	var pb interface{}
+	crw := crawler.NewCrawler([]crawler.ExchangeInterface{binanceSvc}, priceSvc, alertSvc, pb, sugar, cfg)
+
+	err = crw.Run()
+	if err != nil {
+		sugar.Fatalw("crawler error: %w", err)
+	}
 }
 
 func getMySQL(cfg *config.Config) (*gorm.DB, error) {

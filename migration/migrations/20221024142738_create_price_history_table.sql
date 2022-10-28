@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS `price_history`
 (
     `id`         INT NOT NULL AUTO_INCREMENT,
-    `max_price`  DECIMAL(5, 2),
+    `best_price` DECIMAL(5, 2),
     `username`   VARCHAR(32),
     `raw_json`   JSON,
     `created_at` DATETIME DEFAULT NOW(),

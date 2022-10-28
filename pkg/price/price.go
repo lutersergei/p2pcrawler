@@ -4,9 +4,9 @@ import (
 	"time"
 )
 
-type PriceHistoryDB struct {
+type PriceHistory struct {
 	ID            int       `json:"id" gorm:"primarykey"`
-	MaxPrice      float64   `json:"maxPrice"`
+	BestPrice     float64   `json:"best_price"`
 	Username      string    `json:"username"`
 	Exchange      string    `json:"exchange"`
 	RawJSON       string    `json:"rawJSON"`
@@ -14,6 +14,6 @@ type PriceHistoryDB struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 
-func (PriceHistoryDB) TableName() string {
+func (PriceHistory) TableName() string {
 	return "price_history"
 }

@@ -15,9 +15,9 @@ func NewPriceService(rep PriceRepository, logger *zap.SugaredLogger) *PriceServi
 }
 
 type PriceRepository interface {
-	Insert(history *price.PriceHistoryDB) error
+	Insert(history *price.PriceHistory) error
 }
 
-func (svc PriceService) Insert(model *price.PriceHistoryDB) error {
+func (svc PriceService) Insert(model *price.PriceHistory) error {
 	return svc.rep.Insert(model)
 }
