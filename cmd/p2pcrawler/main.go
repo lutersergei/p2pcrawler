@@ -37,17 +37,13 @@ func main() {
 	}
 
 	// bot settings
-	pref := tele.Settings{
-		Token:  cfg.TgBotToken,
-		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
-	}
-	bot, err := tele.NewBot(pref)
+	bot, err := getTgBot(cfg)
 	if err != nil {
 		sugar.Fatalw("connect to bot: ", zap.Error(err))
 	}
 
 	// database
-	gormDB, err := getMySQL(cfg)
+	gormDB, err := getDB(cfg)
 	if err != nil {
 		sugar.Fatalw("gormDB", zap.Error(err))
 	}
@@ -71,6 +67,16 @@ func main() {
 	var pb interface{}
 	crw := crawler.NewCrawler([]crawler.ExchangeInterface{binanceSvc}, priceSvc, alertSvc, pb, sugar, cfg)
 
+	addTgHandlers(bot, sugar, alertRepo)
+	go bot.Start()
+
+	err = crw.Run()
+	if err != nil {
+		sugar.Fatalw("crawler error: %w", err)
+	}
+}
+
+func addTgHandlers(bot *tele.Bot, sugar *zap.SugaredLogger, alertRepo service2.AlertRepository) {
 	bot.Handle("/ping", func(c tele.Context) error {
 		sugar.Infof("Receive msg from telegram")
 		return c.Send("Pong!!")
@@ -96,16 +102,17 @@ func main() {
 
 		return c.Send(fmt.Sprintf("Add alert for: %v", value))
 	})
-
-	go bot.Start()
-
-	err = crw.Run()
-	if err != nil {
-		sugar.Fatalw("crawler error: %w", err)
-	}
 }
 
-func getMySQL(cfg *config.Config) (*gorm.DB, error) {
+func getTgBot(cfg *config.Config) (*tele.Bot, error) {
+	pref := tele.Settings{
+		Token:  cfg.TgBotToken,
+		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
+	}
+	return tele.NewBot(pref)
+}
+
+func getDB(cfg *config.Config) (*gorm.DB, error) {
 	mysqlDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
 	mysqlDsn += "&charset=utf8mb4"
 	mysqlDsn += "&interpolateParams=true"
