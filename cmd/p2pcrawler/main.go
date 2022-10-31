@@ -72,7 +72,7 @@ func main() {
 
 	err = crw.Run()
 	if err != nil {
-		sugar.Fatalw("crawler error: %w", err)
+		sugar.Fatalw("crawler svc", zap.Error(err))
 	}
 }
 
