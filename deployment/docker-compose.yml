@@ -3,9 +3,9 @@ version: '3.1'
 services:
   p2p-crawler:
     env_file:
-      - configs/.env
+      - ../configs/.env
     build:
-      context: .
+      context: ../
       dockerfile: build/Dockerfile
     image: crawler:latest
     links:
