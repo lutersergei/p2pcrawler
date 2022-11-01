@@ -47,23 +47,31 @@ func (svc *Crawler) Run() error {
 		case <-times:
 			for _, exchange := range svc.exchanges {
 				t := time.Now()
-				svc.logger.Infof("start requset to %s", exchange.GetName())
+				svc.logger.Infof("Start requset to %s", exchange.GetName())
 				resp, err := exchange.DoRequest()
 				if err != nil {
 					return fmt.Errorf("exchange request: %w", err)
 				}
+				tEnd := time.Since(t)
 
+				t1 := time.Now()
 				err = svc.priceSvc.Insert(resp)
 				if err != nil {
 					return fmt.Errorf("save response: %w", err)
 				}
+				t1End := time.Since(t1)
 
+				t2 := time.Now()
 				err = svc.alertSvc.HandlePrice(resp)
 				if err != nil {
 					return fmt.Errorf("alerting: %w", err)
 				}
+				t2End := time.Since(t2)
 
-				svc.logger.Infof("end requset to %s, handle time: %v", exchange.GetName(), time.Since(t))
+				svc.logger.Infow("Request timings",
+					"request", tEnd,
+					"insert", t1End,
+					"alert", t2End)
 			}
 		}
 	}
