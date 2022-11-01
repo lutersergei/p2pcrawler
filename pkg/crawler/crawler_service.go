@@ -2,6 +2,7 @@ package crawler
 
 import (
 	"fmt"
+	"github.com/avast/retry-go/v4"
 	"go.uber.org/zap"
 	alert "p2p_crawler/pkg/alert/service"
 	"p2p_crawler/pkg/config"
@@ -46,11 +47,25 @@ func (svc *Crawler) Run() error {
 		select {
 		case <-times:
 			for _, exchange := range svc.exchanges {
+				var resp *price.PriceHistory
+
+				var requestFunc retry.RetryableFunc = func() error {
+					var err error
+					resp, err = exchange.DoRequest()
+					if err != nil {
+						return fmt.Errorf("exchange request: %w", err)
+					}
+					return nil
+				}
+
 				t := time.Now()
-				svc.logger.Infof("Start requset to %s", exchange.GetName())
-				resp, err := exchange.DoRequest()
+
+				svc.logger.Infof("Start request to %s", exchange.GetName())
+				err := retry.Do(requestFunc, retry.OnRetry(func(n uint, err error) {
+					svc.logger.Infof("#%d: %s", n, err)
+				}))
 				if err != nil {
-					return fmt.Errorf("exchange request: %w", err)
+					return fmt.Errorf("err after retry: %w", err)
 				}
 				tEnd := time.Since(t)
 

@@ -3,6 +3,7 @@ module p2p_crawler
 go 1.18
 
 require (
+	github.com/avast/retry-go/v4 v4.1.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.4.0
 	github.com/pressly/goose/v3 v3.7.0
