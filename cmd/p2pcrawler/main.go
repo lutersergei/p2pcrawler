@@ -13,8 +13,9 @@ import (
 	"p2p_crawler/pkg/alert"
 	"p2p_crawler/pkg/alert/handler"
 	"p2p_crawler/pkg/alert/repository"
-	service2 "p2p_crawler/pkg/alert/service"
+	alrt "p2p_crawler/pkg/alert/service"
 	"p2p_crawler/pkg/binance/service"
+	chrt "p2p_crawler/pkg/chart/service"
 	"p2p_crawler/pkg/config"
 	"p2p_crawler/pkg/crawler"
 	"p2p_crawler/pkg/price/repo"
@@ -60,14 +61,15 @@ func main() {
 	priceRepo := repo.NewPriceRepo(gormDB)
 	alertRepo := repository.NewAlertRepo(gormDB)
 	priceSvc := price.NewPriceService(priceRepo, sugar)
-
 	tgHandler := handler.NewTelegramHandler(cfg, sugar, bot)
-	alertSvc := service2.NewAlertService(tgHandler, alertRepo, sugar)
+	alertSvc := alrt.NewAlertService(tgHandler, alertRepo, sugar)
 
 	var pb interface{}
 	crw := crawler.NewCrawler([]crawler.ExchangeInterface{binanceSvc}, priceSvc, alertSvc, pb, sugar, cfg)
 
-	addTgHandlers(bot, sugar, alertRepo)
+	chartSvc := chrt.NewChartService(sugar, priceRepo)
+
+	addTgHandlers(bot, sugar, alertRepo, chartSvc)
 	go bot.Start()
 
 	err = crw.Run()
@@ -76,7 +78,7 @@ func main() {
 	}
 }
 
-func addTgHandlers(bot *tele.Bot, sugar *zap.SugaredLogger, alertRepo service2.AlertRepository) {
+func addTgHandlers(bot *tele.Bot, sugar *zap.SugaredLogger, alertRepo alrt.AlertRepository, chartSvc *chrt.ChartService) {
 	bot.Handle("/ping", func(c tele.Context) error {
 		sugar.Infof("Receive msg from telegram")
 		return c.Send("Pong!!")
@@ -101,6 +103,26 @@ func addTgHandlers(bot *tele.Bot, sugar *zap.SugaredLogger, alertRepo service2.A
 		})
 
 		return c.Send(fmt.Sprintf("Add alert for: %v", value))
+	})
+
+	bot.Handle("/hour", func(c tele.Context) error {
+		sugar.Infof("Receive msg from telegram: hour")
+		return chartSvc.Hour(c)
+	})
+
+	bot.Handle("/day", func(c tele.Context) error {
+		sugar.Infof("Receive msg from telegram: day")
+		return chartSvc.Day(c)
+	})
+
+	bot.Handle("/week", func(c tele.Context) error {
+		sugar.Infof("Receive msg from telegram: week")
+		return chartSvc.Week(c)
+	})
+
+	bot.Handle("/month", func(c tele.Context) error {
+		sugar.Infof("Receive msg from telegram: month")
+		return chartSvc.Month(c)
 	})
 }
 
