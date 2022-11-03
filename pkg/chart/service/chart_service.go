@@ -28,117 +28,53 @@ type PriceChartRepository interface {
 func (svc *ChartService) Hour(ctx tele.Context) error {
 	data := svc.rep.HourChartData()
 
-	var candlesData []gocandles.Candle
-	for i := range data {
-		candlesData = append(candlesData, gocandles.Candle{
-			Date:   int64(data[i].Time * chart.MINUTE),
-			High:   data[i].High,
-			Low:    data[i].Low,
-			Open:   data[i].High,
-			Close:  data[i].Low,
-			Volume: 0,
-		})
-	}
+	candlesData := buildCandles(data, chart.MINUTE)
 
-	var buf bytes.Buffer
-
-	err := gocandles.WriteChart(candlesData, getChartOption(), &buf)
+	chrt, err := buildChart(candlesData)
 	if err != nil {
-		svc.logger.Error(err)
+		return err
 	}
 
-	a := &tele.Photo{
-		File: tele.FromReader(&buf),
-	}
-
-	return ctx.Send(a)
+	return ctx.Send(chrt)
 }
 
 func (svc *ChartService) Day(ctx tele.Context) error {
 	data := svc.rep.DayChartData()
 
-	var candlesData []gocandles.Candle
-	for i := range data {
-		candlesData = append(candlesData, gocandles.Candle{
-			Date:   int64(data[i].Time * chart.MINUTE * 30),
-			High:   data[i].High,
-			Low:    data[i].Low,
-			Open:   data[i].High,
-			Close:  data[i].Low,
-			Volume: 0,
-		})
-	}
+	candlesData := buildCandles(data, chart.MINUTE*30)
 
-	var buf bytes.Buffer
-
-	err := gocandles.WriteChart(candlesData, getChartOption(), &buf)
+	chrt, err := buildChart(candlesData)
 	if err != nil {
-		svc.logger.Error(err)
+		return err
 	}
 
-	a := &tele.Photo{
-		File: tele.FromReader(&buf),
-	}
-
-	return ctx.Send(a)
+	return ctx.Send(chrt)
 }
 
 func (svc *ChartService) Week(ctx tele.Context) error {
 	data := svc.rep.WeekChartData()
 
-	var candlesData []gocandles.Candle
-	for i := range data {
-		candlesData = append(candlesData, gocandles.Candle{
-			Date:   int64(data[i].Time * chart.HOUR * 4),
-			High:   data[i].High,
-			Low:    data[i].Low,
-			Open:   data[i].High,
-			Close:  data[i].Low,
-			Volume: 0,
-		})
-	}
+	candlesData := buildCandles(data, chart.HOUR*4)
 
-	var buf bytes.Buffer
-
-	err := gocandles.WriteChart(candlesData, getChartOption(), &buf)
+	chrt, err := buildChart(candlesData)
 	if err != nil {
-		svc.logger.Error(err)
+		return err
 	}
 
-	a := &tele.Photo{
-		File: tele.FromReader(&buf),
-	}
-
-	return ctx.Send(a)
+	return ctx.Send(chrt)
 }
 
 func (svc *ChartService) Month(ctx tele.Context) error {
 	data := svc.rep.MonthChartData()
 
-	var candlesData []gocandles.Candle
-	for i := range data {
-		candlesData = append(candlesData, gocandles.Candle{
-			Date:   int64(data[i].Time * chart.DAY),
-			High:   data[i].High,
-			Low:    data[i].Low,
-			Open:   data[i].High,
-			Close:  data[i].Low,
-			Volume: 0,
-		})
-	}
+	candlesData := buildCandles(data, chart.DAY)
 
-	var buf bytes.Buffer
-
-	err := gocandles.WriteChart(candlesData, getChartOption(), &buf)
+	chrt, err := buildChart(candlesData)
 	if err != nil {
-		svc.logger.Error(err)
+		return err
 	}
 
-	a := &tele.Photo{
-		File: tele.FromReader(&buf),
-	}
-
-	return ctx.Send(a)
+	return ctx.Send(chrt)
 }
 
 func getChartOption() gocandles.Options {
@@ -156,4 +92,46 @@ func getChartOption() gocandles.Options {
 		Rows:                 5,
 		Columns:              7,
 	}
+}
+
+func buildCandles(data []chart.HighLow, candleDur int) []gocandles.Candle {
+	var prevHigh float64
+	var candlesData []gocandles.Candle
+	for i := range data {
+		if prevHigh > data[i].High {
+			candlesData = append(candlesData, gocandles.Candle{
+				Date:  int64(data[i].Time * candleDur),
+				High:  data[i].High,
+				Low:   data[i].Low,
+				Open:  data[i].High,
+				Close: data[i].Low,
+			})
+		} else {
+			candlesData = append(candlesData, gocandles.Candle{
+				Date:  int64(data[i].Time * candleDur),
+				High:  data[i].High,
+				Low:   data[i].Low,
+				Open:  data[i].Low,
+				Close: data[i].High,
+			})
+		}
+		prevHigh = data[i].High
+	}
+
+	return candlesData
+}
+
+func buildChart(data []gocandles.Candle) (tele.Sendable, error) {
+	var buf bytes.Buffer
+
+	err := gocandles.WriteChart(data, getChartOption(), &buf)
+	if err != nil {
+		return nil, err
+	}
+
+	a := &tele.Photo{
+		File: tele.FromReader(&buf),
+	}
+
+	return a, nil
 }
