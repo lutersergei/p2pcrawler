@@ -95,10 +95,10 @@ func getChartOption() gocandles.Options {
 }
 
 func buildCandles(data []chart.HighLow, candleDur int) []gocandles.Candle {
-	var prevHigh float64
+	var prevHigh, prevLow float64
 	var candlesData []gocandles.Candle
 	for i := range data {
-		if prevHigh > data[i].High {
+		if (prevHigh > data[i].High && prevLow > data[i].Low) || (prevHigh == data[i].High && prevLow > data[i].Low) {
 			candlesData = append(candlesData, gocandles.Candle{
 				Date:  int64(data[i].Time * candleDur),
 				High:  data[i].High,
@@ -116,6 +116,7 @@ func buildCandles(data []chart.HighLow, candleDur int) []gocandles.Candle {
 			})
 		}
 		prevHigh = data[i].High
+		prevLow = data[i].Low
 	}
 
 	return candlesData
