@@ -1,9 +1,9 @@
 package repository
 
 import (
+	"github.com/lutersergei/p2pcrawler/pkg/alert"
+	"github.com/lutersergei/p2pcrawler/pkg/price"
 	"gorm.io/gorm"
-	"p2p_crawler/pkg/alert"
-	"p2p_crawler/pkg/price"
 )
 
 type AlertRepo struct {

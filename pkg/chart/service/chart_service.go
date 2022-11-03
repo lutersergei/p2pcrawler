@@ -2,11 +2,11 @@ package service
 
 import (
 	"bytes"
+	"github.com/lutersergei/p2pcrawler/pkg/chart"
+	"github.com/lutersergei/p2pcrawler/pkg/chart/gocandles"
 	"go.uber.org/zap"
 	tele "gopkg.in/telebot.v3"
 	"image/color"
-	"p2p_crawler/pkg/chart"
-	"p2p_crawler/pkg/chart/gocandles"
 )
 
 type ChartService struct {

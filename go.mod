@@ -1,4 +1,4 @@
-module p2p_crawler
+module github.com/lutersergei/p2pcrawler
 
 go 1.18
 

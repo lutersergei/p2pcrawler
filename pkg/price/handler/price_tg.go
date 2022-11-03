@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
+	price "github.com/lutersergei/p2pcrawler/pkg/price/service"
 	tele "gopkg.in/telebot.v3"
-	price "p2p_crawler/pkg/price/service"
 )
 
 type PriceTg struct {
@@ -27,10 +27,4 @@ func (h *PriceTg) CurrentPrice(c tele.Context) error {
 	}
 
 	return c.Send(msg)
-	//_, err = h.bot.Send(&tele.User{ID: int64(h.cfg.TgUser)}, msg)
-	//if err != nil {
-	//	return fmt.Errorf("send to tg: %v", err)
-	//}
-	//
-	//return nil
 }

@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 	"github.com/avast/retry-go/v4"
+	"github.com/lutersergei/p2pcrawler/pkg/price"
 	"go.uber.org/zap"
-	"p2p_crawler/pkg/price"
 )
 
 type PriceService struct {

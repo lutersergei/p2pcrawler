@@ -3,11 +3,11 @@ package crawler
 import (
 	"fmt"
 	"github.com/avast/retry-go/v4"
+	alert "github.com/lutersergei/p2pcrawler/pkg/alert/service"
+	"github.com/lutersergei/p2pcrawler/pkg/config"
+	"github.com/lutersergei/p2pcrawler/pkg/price"
+	"github.com/lutersergei/p2pcrawler/pkg/price/service"
 	"go.uber.org/zap"
-	alert "p2p_crawler/pkg/alert/service"
-	"p2p_crawler/pkg/config"
-	"p2p_crawler/pkg/price"
-	"p2p_crawler/pkg/price/service"
 	"time"
 )
 

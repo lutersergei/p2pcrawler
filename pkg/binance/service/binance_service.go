@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/lutersergei/p2pcrawler/pkg/binance"
+	"github.com/lutersergei/p2pcrawler/pkg/price"
 	"io/ioutil"
 	"net/http"
-	"p2p_crawler/pkg/binance"
-	"p2p_crawler/pkg/price"
 	"strconv"
 )
 

@@ -2,11 +2,11 @@ package handler
 
 import (
 	"fmt"
+	"github.com/lutersergei/p2pcrawler/pkg/alert"
+	"github.com/lutersergei/p2pcrawler/pkg/config"
+	"github.com/lutersergei/p2pcrawler/pkg/price"
 	"go.uber.org/zap"
 	tele "gopkg.in/telebot.v3"
-	"p2p_crawler/pkg/alert"
-	"p2p_crawler/pkg/config"
-	"p2p_crawler/pkg/price"
 )
 
 type AlertTg struct {

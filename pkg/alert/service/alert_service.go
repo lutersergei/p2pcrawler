@@ -1,9 +1,9 @@
 package service
 
 import (
+	"github.com/lutersergei/p2pcrawler/pkg/alert"
+	"github.com/lutersergei/p2pcrawler/pkg/price"
 	"go.uber.org/zap"
-	"p2p_crawler/pkg/alert"
-	"p2p_crawler/pkg/price"
 )
 
 type AlertService struct {

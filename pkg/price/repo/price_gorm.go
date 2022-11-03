@@ -1,9 +1,9 @@
 package repo
 
 import (
+	"github.com/lutersergei/p2pcrawler/pkg/chart"
+	"github.com/lutersergei/p2pcrawler/pkg/price"
 	"gorm.io/gorm"
-	"p2p_crawler/pkg/chart"
-	"p2p_crawler/pkg/price"
 )
 
 type PriceRepo struct {
