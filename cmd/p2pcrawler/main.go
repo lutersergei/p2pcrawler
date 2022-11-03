@@ -18,8 +18,10 @@ import (
 	chrt "p2p_crawler/pkg/chart/service"
 	"p2p_crawler/pkg/config"
 	"p2p_crawler/pkg/crawler"
+	"p2p_crawler/pkg/price"
+	handler2 "p2p_crawler/pkg/price/handler"
 	"p2p_crawler/pkg/price/repo"
-	price "p2p_crawler/pkg/price/service"
+	prc "p2p_crawler/pkg/price/service"
 	"strconv"
 	"strings"
 	"time"
@@ -60,16 +62,18 @@ func main() {
 	binanceSvc := service.NewBinanceService(httpClient)
 	priceRepo := repo.NewPriceRepo(gormDB)
 	alertRepo := repository.NewAlertRepo(gormDB)
-	priceSvc := price.NewPriceService(priceRepo, sugar)
-	tgHandler := handler.NewTelegramHandler(cfg, sugar, bot)
-	alertSvc := alrt.NewAlertService(tgHandler, alertRepo, sugar)
+	priceSvc := prc.NewPriceService(priceRepo, sugar, []price.ExchangeInterface{binanceSvc})
+	alertTgHandler := handler.NewAlertTgHandler(cfg, sugar, bot)
+	priceTgHandler := handler2.NewPriceTgHandler(priceSvc)
+	alertSvc := alrt.NewAlertService(alertTgHandler, alertRepo, sugar)
 
 	var pb interface{}
-	crw := crawler.NewCrawler([]crawler.ExchangeInterface{binanceSvc}, priceSvc, alertSvc, pb, sugar, cfg)
+	crw := crawler.NewCrawler([]price.ExchangeInterface{binanceSvc}, priceSvc, alertSvc, pb, sugar, cfg)
 
 	chartSvc := chrt.NewChartService(sugar, priceRepo)
 
 	addTgHandlers(bot, sugar, alertRepo, chartSvc)
+	bot.Handle("/current", priceTgHandler.CurrentPrice)
 	go bot.Start()
 
 	err = crw.Run()

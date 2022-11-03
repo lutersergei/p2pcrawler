@@ -14,7 +14,7 @@ func NewAlertRepo(db *gorm.DB) *AlertRepo {
 	return &AlertRepo{db: db}
 }
 
-func (a *AlertRepo) Match(history *price.PriceHistory) []*alert.AlertDB {
+func (a *AlertRepo) Match(history *price.PriceModel) []*alert.AlertDB {
 	var alerts []*alert.AlertDB
 
 	a.db.Where("price <= ? AND status = ?", history.BestPrice, alert.Active).Find(&alerts)

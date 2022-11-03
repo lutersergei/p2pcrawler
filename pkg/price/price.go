@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type PriceHistory struct {
+type PriceModel struct {
 	ID            int       `json:"id" gorm:"primarykey"`
 	BestPrice     float64   `json:"best_price"`
 	Username      string    `json:"username"`
@@ -14,6 +14,21 @@ type PriceHistory struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 
-func (PriceHistory) TableName() string {
+type CurrentPriceResponse struct {
+	ExchangeName string
+	BestPrice    float64
+}
+
+func (PriceModel) TableName() string {
 	return "price_history"
+}
+
+type ExchangeInterface interface {
+	GetName() string
+	DoRequest() (*PriceModel, error)
+}
+
+type PubSubInterface interface {
+	//Subscribe(topic string) error
+	//Unsubscribe(topic string) error
 }

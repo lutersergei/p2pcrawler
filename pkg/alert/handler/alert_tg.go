@@ -9,23 +9,23 @@ import (
 	"p2p_crawler/pkg/price"
 )
 
-type TelegramHandler struct {
+type AlertTg struct {
 	cfg    *config.Config
 	bot    *tele.Bot
 	logger *zap.SugaredLogger
 }
 
-func NewTelegramHandler(cfg *config.Config, logger *zap.SugaredLogger, bot *tele.Bot) *TelegramHandler {
+func NewAlertTgHandler(cfg *config.Config, logger *zap.SugaredLogger, bot *tele.Bot) *AlertTg {
 
-	return &TelegramHandler{cfg: cfg, bot: bot, logger: logger}
+	return &AlertTg{cfg: cfg, bot: bot, logger: logger}
 }
 
-func (t *TelegramHandler) GetName() string {
+func (h *AlertTg) GetName() string {
 	return "telegram"
 }
 
-func (t *TelegramHandler) Alert(al *alert.AlertDB, price *price.PriceHistory) error {
-	_, err := t.bot.Send(&tele.User{ID: int64(t.cfg.TgUser)}, fmt.Sprintf(
+func (h *AlertTg) Alert(al *alert.AlertDB, price *price.PriceModel) error {
+	_, err := h.bot.Send(&tele.User{ID: int64(h.cfg.TgUser)}, fmt.Sprintf(
 		"Price: %v, User: %s, Amount: %v",
 		price.BestPrice,
 		price.Username,

@@ -12,33 +12,23 @@ import (
 )
 
 type Crawler struct {
-	exchanges []ExchangeInterface
+	exchanges []price.ExchangeInterface
 	priceSvc  *service.PriceService
 	alertSvc  *alert.AlertService
-	pubSub    PubSubInterface
+	pubSub    price.PubSubInterface
 	logger    *zap.SugaredLogger
 	cfg       *config.Config
 }
 
 func NewCrawler(
-	exch []ExchangeInterface,
+	exch []price.ExchangeInterface,
 	priceSvc *service.PriceService,
 	alertSvc *alert.AlertService,
-	pubSub PubSubInterface,
+	pubSub price.PubSubInterface,
 	logger *zap.SugaredLogger,
 	cfg *config.Config,
 ) *Crawler {
 	return &Crawler{exchanges: exch, priceSvc: priceSvc, alertSvc: alertSvc, pubSub: pubSub, logger: logger, cfg: cfg}
-}
-
-type ExchangeInterface interface {
-	GetName() string
-	DoRequest() (*price.PriceHistory, error)
-}
-
-type PubSubInterface interface {
-	//Subscribe(topic string) error
-	//Unsubscribe(topic string) error
 }
 
 func (svc *Crawler) Run() error {
@@ -47,7 +37,7 @@ func (svc *Crawler) Run() error {
 		select {
 		case <-times:
 			for _, exchange := range svc.exchanges {
-				var resp *price.PriceHistory
+				var resp *price.PriceModel
 
 				var requestFunc retry.RetryableFunc = func() error {
 					var err error

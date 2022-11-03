@@ -18,16 +18,16 @@ func NewAlertService(h AlertHandler, rep AlertRepository, logger *zap.SugaredLog
 
 type AlertHandler interface {
 	GetName() string
-	Alert(*alert.AlertDB, *price.PriceHistory) error
+	Alert(*alert.AlertDB, *price.PriceModel) error
 }
 
 type AlertRepository interface {
-	Match(*price.PriceHistory) []*alert.AlertDB
+	Match(*price.PriceModel) []*alert.AlertDB
 	Insert(*alert.AlertDB) error
 	Deactivate(*alert.AlertDB)
 }
 
-func (svc *AlertService) HandlePrice(model *price.PriceHistory) error {
+func (svc *AlertService) HandlePrice(model *price.PriceModel) error {
 	alerts := svc.rep.Match(model)
 
 	for _, a := range alerts {
