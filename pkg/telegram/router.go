@@ -26,5 +26,6 @@ func (r *TgRouter) ApplyRoutes() {
 	r.bot.Handle(&r.nav.BtnChartWeek, r.handler.ChartWeek)
 	r.bot.Handle(&r.nav.BtnChartMonth, r.handler.ChartMonth)
 
+	r.bot.Handle(&r.nav.BtnAllNotify, r.handler.GetAllNotify)
 	r.bot.Handle("/add", r.handler.AddNotification)
 }

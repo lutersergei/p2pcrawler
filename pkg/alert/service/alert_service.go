@@ -25,10 +25,15 @@ type AlertRepository interface {
 	Match(*price.PriceModel) []*alert.AlertDB
 	Insert(*alert.AlertDB) error
 	Deactivate(*alert.AlertDB)
+	GetByUsername(string) ([]*alert.AlertDB, error)
 }
 
 func (svc *AlertService) AddAlert(a *alert.AlertDB) error {
 	return svc.rep.Insert(a)
+}
+
+func (svc *AlertService) GetAlertsByUsername(u string) ([]*alert.AlertDB, error) {
+	return svc.rep.GetByUsername(u)
 }
 
 func (svc *AlertService) HandlePrice(model *price.PriceModel) error {

@@ -32,3 +32,11 @@ func (a *AlertRepo) Deactivate(model *alert.AlertDB) {
 	model.Status = alert.Done
 	a.db.Save(model)
 }
+
+func (a *AlertRepo) GetByUsername(username string) ([]*alert.AlertDB, error) {
+	var alerts []*alert.AlertDB
+
+	a.db.Where("username = ? AND status = ?", username, alert.Active).Find(&alerts)
+
+	return alerts, nil
+}

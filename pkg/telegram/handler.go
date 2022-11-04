@@ -8,6 +8,7 @@ import (
 	price "github.com/lutersergei/p2pcrawler/pkg/price/service"
 	tele "gopkg.in/telebot.v3"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -42,6 +43,22 @@ func (h *TgHandler) ChartMenu(c tele.Context) error {
 
 func (h *TgHandler) NotifyMenu(c tele.Context) error {
 	return c.Send("Choose 👇", h.navigationSvc.NotifyMenu)
+}
+
+func (h *TgHandler) GetAllNotify(c tele.Context) error {
+	user := c.Sender().Username
+	alerts, err := h.alertSvc.GetAlertsByUsername(user)
+	if err != nil {
+		return err
+	}
+
+	var msg string
+	for _, alertDB := range alerts {
+		msg += fmt.Sprintf("Price: %v: Added: %v\n", alertDB.Price, alertDB.CreatedAt)
+	}
+	msg = strings.TrimSuffix(msg, "\n")
+
+	return c.Send(msg)
 }
 
 func (h *TgHandler) CurrentPrice(c tele.Context) error {
