@@ -27,6 +27,10 @@ type AlertRepository interface {
 	Deactivate(*alert.AlertDB)
 }
 
+func (svc *AlertService) AddAlert(a *alert.AlertDB) error {
+	return svc.rep.Insert(a)
+}
+
 func (svc *AlertService) HandlePrice(model *price.PriceModel) error {
 	alerts := svc.rep.Match(model)
 
