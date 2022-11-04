@@ -19,6 +19,7 @@ import (
 	prc "github.com/lutersergei/p2pcrawler/pkg/price/service"
 	"go.uber.org/zap"
 	tele "gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v3/middleware"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/http"
@@ -44,6 +45,7 @@ func main() {
 	if err != nil {
 		sugar.Fatalw("connect to bot: ", zap.Error(err))
 	}
+	bot.Use(middleware.Logger())
 
 	// database
 	gormDB, err := getDB(cfg)
