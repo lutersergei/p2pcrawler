@@ -70,7 +70,7 @@ func (h *TgHandler) CurrentPrice(c tele.Context) error {
 	}
 
 	for _, response := range r {
-		msg += fmt.Sprintf("%s: %v", response.ExchangeName, response.BestPrice)
+		msg += fmt.Sprintf("%s: %v. Amount: %v", response.ExchangeName, response.BestPrice, response.SurplusAmount)
 	}
 
 	return c.Send(msg)

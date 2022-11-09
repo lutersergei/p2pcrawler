@@ -15,8 +15,9 @@ type PriceModel struct {
 }
 
 type CurrentPriceResponse struct {
-	ExchangeName string
-	BestPrice    float64
+	ExchangeName  string
+	BestPrice     float64
+	SurplusAmount float64
 }
 
 func (PriceModel) TableName() string {

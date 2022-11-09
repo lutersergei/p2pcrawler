@@ -45,7 +45,11 @@ func (svc *PriceService) CurrentPrice() ([]price.CurrentPriceResponse, error) {
 		if err != nil {
 			return nil, fmt.Errorf("err after retry: %w", err)
 		}
-		r = append(r, price.CurrentPriceResponse{ExchangeName: exchange.GetName(), BestPrice: resp.BestPrice})
+		r = append(r, price.CurrentPriceResponse{
+			ExchangeName:  exchange.GetName(),
+			BestPrice:     resp.BestPrice,
+			SurplusAmount: resp.SurplusAmount,
+		})
 	}
 
 	return r, nil
