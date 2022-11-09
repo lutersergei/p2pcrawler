@@ -10,6 +10,15 @@ type PriceRepo struct {
 	db *gorm.DB
 }
 
+var query = `SELECT DISTINCT FLOOR(UNIX_TIMESTAMP(created_at)/?) AS time,
+	MIN(best_price) OVER w as low,
+	MAX(best_price) OVER w as high,
+	FIRST_VALUE(best_price) OVER w AS 'first',
+	LAST_VALUE(best_price) OVER w AS 'last'
+	FROM price_history
+	WHERE created_at > date_sub(now(), INTERVAL ? SECOND)
+	WINDOW w AS (PARTITION BY FLOOR(UNIX_TIMESTAMP(created_at)/?));`
+
 func NewPriceRepo(db *gorm.DB) *PriceRepo {
 	return &PriceRepo{db: db}
 }
@@ -22,11 +31,7 @@ func (r *PriceRepo) Insert(history *price.PriceModel) error {
 
 func (r *PriceRepo) HourChartData() []chart.HighLow {
 	var data []chart.HighLow
-
-	r.db.Raw("SELECT FLOOR(UNIX_TIMESTAMP(`created_at`)/(1 * 60)) AS time, " +
-		"MAX(`best_price`) as high, MIN(`best_price`) as low FROM `price_history` " +
-		"WHERE created_at >= date_sub(now(), INTERVAL 55 minute) " +
-		"GROUP BY time").Scan(&data)
+	r.db.Raw(query, chart.MINUTE, chart.HOUR, chart.MINUTE).Scan(&data)
 
 	return data
 }
@@ -34,10 +39,7 @@ func (r *PriceRepo) HourChartData() []chart.HighLow {
 func (r *PriceRepo) DayChartData() []chart.HighLow {
 	var data []chart.HighLow
 
-	r.db.Raw("SELECT FLOOR(UNIX_TIMESTAMP(`created_at`)/(30 * 60)) AS time, " +
-		"MAX(`best_price`) as high, MIN(`best_price`) as low FROM `price_history` " +
-		"WHERE created_at >= date_sub(now(), INTERVAL 1 day) " +
-		"GROUP BY time").Scan(&data)
+	r.db.Raw(query, chart.MINUTE*30, chart.DAY, chart.MINUTE*30).Scan(&data)
 
 	return data
 }
@@ -45,10 +47,7 @@ func (r *PriceRepo) DayChartData() []chart.HighLow {
 func (r *PriceRepo) WeekChartData() []chart.HighLow {
 	var data []chart.HighLow
 
-	r.db.Raw("SELECT FLOOR(UNIX_TIMESTAMP(`created_at`)/(4 * 60 * 60)) AS time, " +
-		"MAX(`best_price`) as high, MIN(`best_price`) as low FROM `price_history` " +
-		"WHERE created_at >= date_sub(now(), INTERVAL 1 week) " +
-		"GROUP BY time").Scan(&data)
+	r.db.Raw(query, chart.HOUR*4, chart.WEEK, chart.HOUR*4).Scan(&data)
 
 	return data
 }
@@ -56,10 +55,7 @@ func (r *PriceRepo) WeekChartData() []chart.HighLow {
 func (r *PriceRepo) MonthChartData() []chart.HighLow {
 	var data []chart.HighLow
 
-	r.db.Raw("SELECT FLOOR(UNIX_TIMESTAMP(`created_at`)/(60 * 60 * 24)) AS time, " +
-		"MAX(`best_price`) as high, MIN(`best_price`) as low FROM `price_history` " +
-		"WHERE created_at >= date_sub(now(), INTERVAL 1 month) " +
-		"GROUP BY time").Scan(&data)
+	r.db.Raw(query, chart.HOUR*24, chart.MONTH, chart.HOUR*24).Scan(&data)
 
 	return data
 }
