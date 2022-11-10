@@ -12,4 +12,5 @@ type Config struct {
 	TgUser               int           `env:"TG_USER_ID" env-required:"1"`
 	RequestPeriod        time.Duration `env:"APP_REQUEST_PERIOD_SECONDS" env-required:"1"`
 	TgNotificatorEnabled bool          `env:"APP_TG_NOTIFICATOR" env-required:"1"`
+	SentryDSN            string        `env:"SENTRY_DSN" env-required:"1"`
 }

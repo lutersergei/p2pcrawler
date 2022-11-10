@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/ilyakaznacheev/cleanenv"
 	goose "github.com/lutersergei/p2pcrawler/migration"
@@ -34,13 +35,32 @@ func main() {
 	cfg := &config.Config{}
 	err := cleanenv.ReadConfig("configs/.env", cfg)
 	if err != nil {
-		sugar.Fatalw("read config", zap.Error(err))
+		sugar.Panic("read config", zap.Error(err))
 	}
+
+	// sentry init
+	err = sentry.Init(sentry.ClientOptions{
+		Dsn:              cfg.SentryDSN,
+		TracesSampleRate: 1.0,
+		AttachStacktrace: true,
+		Debug:            true,
+	})
+	if err != nil {
+		sugar.Fatalf("sentry.Init: %s", err)
+	}
+	defer func() {
+		err := recover()
+
+		if err != nil {
+			sentry.CurrentHub().Recover(err)
+			sentry.Flush(time.Second * 5)
+		}
+	}()
 
 	// bot settings
 	bot, err := getTgBot(cfg)
 	if err != nil {
-		sugar.Fatalw("connect to bot: ", zap.Error(err))
+		sugar.Panic("connect to bot: ", zap.Error(err))
 	}
 	// todo rewrite logger
 	bot.Use(middleware.Logger())
@@ -48,12 +68,12 @@ func main() {
 	// DATABASE
 	gormDB, err := getDB(cfg)
 	if err != nil {
-		sugar.Fatalw("gormDB", zap.Error(err))
+		sugar.Panic("gormDB", zap.Error(err))
 	}
 	mysqlDB, _ := gormDB.DB()
 	// db migrate
 	if err := goose.Up(mysqlDB); err != nil {
-		sugar.Fatalw("migration", zap.Error(err))
+		sugar.Panic("migration", zap.Error(err))
 	}
 
 	httpClient := &http.Client{Timeout: time.Second * 15}
@@ -79,7 +99,7 @@ func main() {
 	crw := crawler.NewCrawler([]price.ExchangeInterface{binanceSvc}, priceSvc, alertSvc, pb, sugar, cfg)
 	err = crw.Run()
 	if err != nil {
-		sugar.Fatalw("crawler svc", zap.Error(err))
+		sugar.Panic("crawler svc", zap.Error(err))
 	}
 }
 
