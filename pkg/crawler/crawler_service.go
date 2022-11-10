@@ -51,9 +51,13 @@ func (svc *Crawler) Run() error {
 				t := time.Now()
 
 				svc.logger.Infof("Start request to %s", exchange.GetName())
-				err := retry.Do(requestFunc, retry.OnRetry(func(n uint, err error) {
-					svc.logger.Infof("#%d: %s", n, err)
-				}))
+				err := retry.Do(
+					requestFunc,
+					retry.Attempts(0),
+					retry.OnRetry(func(n uint, err error) {
+						svc.logger.Infof("#%d: %s", n, err)
+					}),
+				)
 				if err != nil {
 					return fmt.Errorf("err after retry: %w", err)
 				}
