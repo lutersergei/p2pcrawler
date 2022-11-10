@@ -24,23 +24,23 @@ func NewNavigationSvc() *NavigationSvc {
 	chartMenu := &tele.ReplyMarkup{ResizeKeyboard: true}
 	notifyMenu := &tele.ReplyMarkup{ResizeKeyboard: true}
 
-	btnNotify := mainMenu.Text("Notify")
-	btnChart := mainMenu.Text("📈 Charts")
-	btnCurrent := mainMenu.Text("Current")
+	btnNotify := mainMenu.Text("Notify menu")
+	btnChart := mainMenu.Text("Charts")
+	btnCurrent := mainMenu.Text("Current Price")
+	btnPing := mainMenu.Text("Ping Me!")
+
 	btnHour := mainMenu.Text("Hour")
 	btnDay := mainMenu.Text("Day")
 	btnWeek := mainMenu.Text("Week")
 	btnMonth := mainMenu.Text("Month")
-	btnPing := mainMenu.Text("Ping Me!")
+
 	btnHome := mainMenu.Text("Home")
-	btnAllNotify := mainMenu.Text("Get my notifications")
-	btnAddNotify := mainMenu.Text("Add notifications")
+	btnAllNotify := mainMenu.Text("All notifications")
+	btnAddNotify := mainMenu.Text("Add notification")
 
 	mainMenu.Reply(
-		mainMenu.Row(btnChart),
-		mainMenu.Row(btnNotify),
-		mainMenu.Row(btnCurrent),
-		mainMenu.Row(btnPing),
+		mainMenu.Row(btnChart, btnNotify),
+		mainMenu.Row(btnCurrent, btnPing),
 	)
 
 	chartMenu.Reply(
@@ -49,7 +49,10 @@ func NewNavigationSvc() *NavigationSvc {
 		chartMenu.Row(btnHome),
 	)
 
-	notifyMenu.Reply(notifyMenu.Row(btnAllNotify, btnAddNotify), notifyMenu.Row(btnHome))
+	notifyMenu.Reply(
+		notifyMenu.Row(btnAllNotify, btnAddNotify),
+		notifyMenu.Row(btnHome),
+	)
 
 	return &NavigationSvc{
 		MainMenu:        mainMenu,
