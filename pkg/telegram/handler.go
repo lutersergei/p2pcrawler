@@ -52,13 +52,17 @@ func (h *TgHandler) GetAllNotify(c tele.Context) error {
 		return err
 	}
 
-	var msg string
-	for _, alertDB := range alerts {
-		msg += fmt.Sprintf("Price: %v: Added: %v\n", alertDB.Price, alertDB.CreatedAt)
-	}
-	msg = strings.TrimSuffix(msg, "\n")
+	if len(alerts) == 0 {
+		return c.Send("You haven't alerts")
+	} else {
+		var msg string
+		for _, alertDB := range alerts {
+			msg += fmt.Sprintf("Price: %v: Added: %v\n", alertDB.Price, alertDB.CreatedAt)
+		}
+		msg = strings.TrimSuffix(msg, "\n")
 
-	return c.Send(msg)
+		return c.Send(msg)
+	}
 }
 
 func (h *TgHandler) CurrentPrice(c tele.Context) error {
