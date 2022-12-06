@@ -1,4 +1,4 @@
-FROM golang:1.18-buster
+FROM golang:buster
 
 WORKDIR /go/src/crawler
 COPY . /go/src/crawler
