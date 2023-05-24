@@ -10,14 +10,15 @@ type PriceRepo struct {
 	db *gorm.DB
 }
 
-var query = `SELECT DISTINCT FLOOR(UNIX_TIMESTAMP(created_at)/?) AS time,
-	MIN(best_price) OVER w as low,
-	MAX(best_price) OVER w as high,
-	FIRST_VALUE(best_price) OVER w AS 'first',
-	LAST_VALUE(best_price) OVER w AS 'last'
-	FROM price_history
-	WHERE created_at > date_sub(now(), INTERVAL ? SECOND)
-	WINDOW w AS (PARTITION BY FLOOR(UNIX_TIMESTAMP(created_at)/?));`
+var query = `SELECT DISTINCT strftime('%s', created_at) / ? AS time,
+    MIN(best_price) OVER w AS low,
+    MAX(best_price) OVER w AS high,
+    FIRST_VALUE(best_price) OVER w AS first,
+    LAST_VALUE(best_price) OVER w AS last
+FROM price_history
+WHERE created_at >  datetime('now', '-' || ? || ' seconds')
+WINDOW w AS (PARTITION BY strftime('%s', created_at) / ?);
+`
 
 func NewPriceRepo(db *gorm.DB) *PriceRepo {
 	return &PriceRepo{db: db}

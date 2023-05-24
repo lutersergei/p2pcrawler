@@ -13,7 +13,7 @@ var embedMigrations embed.FS
 func Up(db *sql.DB) error {
 	goose.SetBaseFS(embedMigrations)
 
-	if err := goose.SetDialect("mysql"); err != nil {
+	if err := goose.SetDialect("sqlite"); err != nil {
 		return fmt.Errorf("set goose dialect: %w", err)
 	}
 

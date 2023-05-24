@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/getsentry/sentry-go"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/ilyakaznacheev/cleanenv"
 	goose "github.com/lutersergei/p2pcrawler/migration"
 	"github.com/lutersergei/p2pcrawler/pkg/alert/handler"
@@ -20,10 +21,8 @@ import (
 	"go.uber.org/zap"
 	tele "gopkg.in/telebot.v3"
 	"gopkg.in/telebot.v3/middleware"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"net/http"
-	"time"
 )
 
 func main() {
@@ -66,13 +65,13 @@ func main() {
 	bot.Use(middleware.Logger())
 
 	// DATABASE
-	gormDB, err := getDB(cfg)
+	gormDB, err := getSQLiteDB(cfg)
 	if err != nil {
 		sugar.Panic("gormDB", zap.Error(err))
 	}
-	mysqlDB, _ := gormDB.DB()
+	SQLiteDB, _ := gormDB.DB()
 	// db migrate
-	if err := goose.Up(mysqlDB); err != nil {
+	if err := goose.Up(SQLiteDB); err != nil {
 		sugar.Panic("migration", zap.Error(err))
 	}
 
@@ -111,11 +110,8 @@ func getTgBot(cfg *config.Config) (*tele.Bot, error) {
 	return tele.NewBot(pref)
 }
 
-func getDB(cfg *config.Config) (*gorm.DB, error) {
-	mysqlDsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
-	mysqlDsn += "&charset=utf8mb4"
-	mysqlDsn += "&interpolateParams=true"
-	mysqlDsn += "&parseTime=true"
-	db, err := gorm.Open(mysql.Open(mysqlDsn), &gorm.Config{})
+func getSQLiteDB(cfg *config.Config) (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open("./db/p2p.db"), &gorm.Config{})
+
 	return db, err
 }

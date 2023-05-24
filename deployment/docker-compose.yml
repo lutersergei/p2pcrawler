@@ -8,31 +8,3 @@ services:
       context: ../
       dockerfile: build/Dockerfile
     image: crawler:latest
-    links:
-      - p2p_db:p2p_db
-    depends_on:
-      - "p2p_db"
-    command: [ "/go/src/crawler/scripts/wait-for-it.sh", "p2p_db:3306", "--timeout=30", "--", "/go/src/crawler/bin/p2pcrawler" ]
-
-  p2p_db:
-    image: mysql
-    ports:
-      - '3307:3306'
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    volumes:
-      - p2p_data:/var/lib/mysql
-      - './init.sql:/docker-entrypoint-initdb.d/init.sql'
-    env_file:
-      - ../configs/.env
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8091:8080
-
-volumes:
-  p2p_data:
-    external:
-      name: p2p_data

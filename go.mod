@@ -7,15 +7,14 @@ require (
 	github.com/carlesar/go-candles v0.0.0-20180304144910-6101a4b0120e
 	github.com/disintegration/imaging v1.6.2
 	github.com/getsentry/sentry-go v0.15.0
-	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/ilyakaznacheev/cleanenv v1.4.0
 	github.com/pressly/goose/v3 v3.7.0
 	go.uber.org/zap v1.23.0
 	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69
 	gopkg.in/telebot.v3 v3.1.2
-	gorm.io/driver/mysql v1.4.3
-	gorm.io/gorm v1.24.0
+	gorm.io/driver/sqlite v1.5.1
+	gorm.io/gorm v1.25.0
 )
 
 require (
@@ -23,6 +22,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect

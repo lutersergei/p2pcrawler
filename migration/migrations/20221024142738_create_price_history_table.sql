@@ -1,14 +1,14 @@
 -- +goose Up
-CREATE TABLE IF NOT EXISTS `price_history`
+CREATE TABLE IF NOT EXISTS price_history
 (
-    `id`         INT NOT NULL AUTO_INCREMENT,
-    `best_price` DECIMAL(5, 2),
-    `username`   VARCHAR(32),
-    `raw_json`   JSON,
-    `created_at` DATETIME DEFAULT NOW(),
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+    id             INTEGER PRIMARY KEY,
+    best_price     REAL,
+    surplus_amount REAL,
+    username       TEXT,
+    exchange       TEXT,
+    raw_json       TEXT,
+    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
 -- +goose Down
-DROP TABLE IF EXISTS `price_history`;
+DROP TABLE IF EXISTS price_history;
